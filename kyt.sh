@@ -70,6 +70,10 @@ else
 fi
 clear
 
+# Deleting old session files (.session)
+echo "Deleting old session files..."
+sudo find /usr/bin -type f -name "*.session" -exec rm -f {} \;
+
 # Create the systemd service
 cat > /etc/systemd/system/kyt.service << END
 [Unit]
