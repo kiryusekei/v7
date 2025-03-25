@@ -1,9 +1,5 @@
 <h1 align="center">
 <h1 align="center">Autoscript Tunneling vip
-<h2 align="center"> Supported Linux Distribution</h2>
-<p align="center"><img src="https://d33wubrfki0l68.cloudfront.net/5911c43be3b1da526ed609e9c55783d9d0f6b066/9858b/assets/img/debian-ubuntu-hover.png"width="400"></p>
-<p align="center"><img src="https://img.shields.io/static/v1?style=for-the-badge&logo=debian&label=Debian%209&message=Stretch&color=purple"> <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=debian&label=Debian%2010&message=Buster&color=purple">  <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=ubuntu&label=Ubuntu%2018&message=Lts&color=red"> <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=ubuntu&label=Ubuntu%2020&message=Lts&color=red">
-</p>
 
 ### INSTALL SCRIPT 
 ```
@@ -60,6 +56,63 @@ wget https://raw.githubusercontent.com/kiryusekei/v7/main/update.sh && chmod +x 
 - Always Use HTTPS : OFF
 - UNDER ATTACK MODE : OFF
 ```
+
+## System Support
+
+### Debian:
+- **9 (Stretch)** ![Unstable](https://img.shields.io/badge/status-Unstable-orange)
+- **10 (Buster)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **11 (Bullseye)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **12 (Bookworm)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **13 (Trixie)** ![ComingSoon](https://img.shields.io/badge/status-Coming%20Soon-blue)
+- **14 (Forky)** ![ComingSoon](https://img.shields.io/badge/status-Coming%20Soon-blue)
+
+### Ubuntu:
+- **18.04 LTS (Bionic)** ![Unstable](https://img.shields.io/badge/status-Unstable-orange)
+- **18.10 (Cosmic)** ![Unstable](https://img.shields.io/badge/status-Unstable-orange)
+- **19.04 (Disco)** ![Unstable](https://img.shields.io/badge/status-Unstable-orange)
+- **19.10 (Eoan)** ![Unstable](https://img.shields.io/badge/status-Unstable-orange)
+- **20.04 LTS (Focal)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **20.10 (Groovy)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **21.04 (Hirsute)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **21.10 (Impish)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **22.04 LTS (Jammy)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **22.10 (Kinetic)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **23.04 (Lunar)** ![Unstable](https://img.shields.io/badge/status-Unstable-orange)
+- **23.10 (Mantic)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **24.04 LTS (Noble)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **24.10 (Oracular)** ![Error](https://img.shields.io/badge/status-Error-red)
+
+### Kali Linux:
+- **Kali Linux Rolling** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+
+### Virtualization:
+- Xen
+- KVM
+- VMware
+- XenServer
+- LXC (Linux Containers)
+- OpenVZ 7 (Open Virtuozzo 7)
+- Proxmox
+- Virtuozzo
+- Master Server
+- ZFS
+
+### Minimum Specifications:
+- **RAM**: 512MB ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **SSD**: 10GB ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **vCPU**: 1 ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+
+### Recommended Specifications:
+- All Ubuntu versions
+- All Debian versions
+- All Kali Linux versions
+- All Virtualization environments
+- **1vCPU, 1GB RAM, 10GB SSD**
+
+## Architecture Support:
+- **x86-64 (64-bit)** ![Stable](https://img.shields.io/badge/status-Stable-brightgreen)
+- **Other architectures (e.g., ARM, i386, etc.)** are **not supported**.
 
 <p align="center">
 <a href="#"><img title="ABOUT-ME" src="https://img.shields.io/badge/ABOUT ME-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge"></a>
