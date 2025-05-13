@@ -172,6 +172,8 @@ print_success "Directory Xray"
 #sudo apt update -y
 apt-get install --no-install-recommends software-properties-common
 apt install haproxy -y
+apt install dos2unix -y
+apt install sudo -y
 #add-apt-repository ppa:vbernat/haproxy-2.0 -y
 #apt-get -y install haproxy=2.0.\*
 #elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
@@ -451,7 +453,7 @@ print_success "Password SSH"
 function udp_mini(){
 clear
 print_install "Memasang Service Limit Quota"
-wget https://raw.githubusercontent.com/kiryusekei/v7/main/limit/limit.sh && chmod +x limit.sh && ./limit.sh
+wget ${REPO}limit/limit.sh && chmod +x limit.sh && ./limit.sh
 cd
 wget -q -O /usr/bin/limit-ip "${REPO}limit/limit-ip"
 chmod +x /usr/bin/*
@@ -685,6 +687,10 @@ apt autoclean -y >/dev/null 2>&1
 apt autoremove -y >/dev/null 2>&1
 print_success "ePro WebSocket Proxy"
 }
+function install_plugin(){
+wget -q ${REPO}limit/plugin-lite && chmod +x plugin-lite && ./plugin-lite
+rm plugin-lite
+}
 function ins_restart(){
 clear
 print_install "Restarting  All Packet"
@@ -723,6 +729,7 @@ wget ${REPO}limit/menu.zip
 unzip menu.zip
 chmod +x menu/*
 mv menu/* /usr/local/sbin
+sudo dos2unix /usr/local/sbin/install-plugin
 rm -rf menu
 rm -rf menu.zip
 }
@@ -833,6 +840,7 @@ ins_backup
 ins_swab
 ins_Fail2ban
 ins_epro
+install_plugin
 ins_restart
 menu
 profile
