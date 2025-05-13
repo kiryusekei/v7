@@ -34,6 +34,7 @@ res1() {
     unzip menu.zip
     chmod +x menu/*
     mv menu/* /usr/local/sbin
+    sudo dos2unix /usr/local/sbin/install-plugin
     rm -rf menu
     rm -rf menu.zip
     rm -rf update.sh
