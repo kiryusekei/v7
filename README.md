@@ -15,8 +15,8 @@ wget https://raw.githubusercontent.com/kiryusekei/v7/main/update.sh && chmod +x 
 ```
 
 ### TESTED ON OS 
-- UBUNTU 20.04.05
-- DEBIAN 10
+- UBUNTU 24.04.01
+- DEBIAN 12
 
 ### FITUR TAMBAHAN
 - Tambah Swap 1GiB
