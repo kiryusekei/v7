@@ -174,6 +174,9 @@ apt-get install --no-install-recommends software-properties-common
 apt install haproxy -y
 apt install dos2unix -y
 apt install sudo -y
+apt install rsyslog -y
+systemctl enable rsyslog
+systemctl start rsyslog
 #add-apt-repository ppa:vbernat/haproxy-2.0 -y
 #apt-get -y install haproxy=2.0.\*
 #elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
