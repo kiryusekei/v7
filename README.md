@@ -2,6 +2,10 @@
 <h1 align="center">Autoscript Tunneling vip
 
 ### INSTALL SCRIPT 
+step 1
+```
+apt update -y && apt upgrade -y --fix-missing && apt install -y xxd bzip2 wget curl sudo lsof socat net-tools bc coreutils build-essential bsdmainutils screen dos2unix && update-grub && apt dist-upgrade -y && sleep 2 && reboot
+```
 ```
 apt install -y && apt update -y && apt upgrade -y && apt install lolcat -y && gem install lolcat && wget -q https://raw.githubusercontent.com/kiryusekei/v7/main/premi.sh && chmod +x premi.sh && ./premi.sh
 
