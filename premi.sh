@@ -167,12 +167,28 @@ timedatectl set-timezone Asia/Jakarta
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
 print_success "Directory Xray"
+#if [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "ubuntu" ]]; then
+#echo "Setup Dependencies $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
+#sudo apt update -y
 apt-get install --no-install-recommends software-properties-common
+apt install haproxy -y
 apt install dos2unix -y
 apt install sudo -y
-apt install rsyslog -y
-systemctl enable rsyslog
-systemctl start rsyslog
+#add-apt-repository ppa:vbernat/haproxy-2.0 -y
+#apt-get -y install haproxy=2.0.\*
+#elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
+#echo "Setup Dependencies For OS Is $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
+#curl https://haproxy.debian.net/bernat.debian.org.gpg |
+#gpg --dearmor >/usr/share/keyrings/haproxy.debian.net.gpg
+#echo deb "[signed-by=/usr/share/keyrings/haproxy.debian.net.gpg]" \
+#http://haproxy.debian.net buster-backports-1.8 main \
+#>/etc/apt/sources.list.d/haproxy.list
+#sudo apt-get update
+#apt-get -y install haproxy=1.8.\*
+#else
+#echo -e " Your OS Is Not Supported ($(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') )"
+#exit 1
+#fi
 }
 clear
 function nginx_install() {
@@ -193,7 +209,6 @@ apt install zip pwgen openssl netcat socat cron bash-completion -y
 apt install figlet -y
 apt update -y
 apt upgrade -y
-apt install -y iptables iptables-persistent
 apt dist-upgrade -y
 systemctl enable chronyd
 systemctl restart chronyd
@@ -327,7 +342,6 @@ echo "& plughin Account" >>/etc/ssh/.ssh.db
 function install_xray() {
 clear
 print_install "Core Xray 1.8.1 Latest Version"
-apt install haproxy -y
 domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
 chown www-data.www-data $domainSock_dir
 latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
@@ -344,10 +358,9 @@ print_install "Memasang Konfigurasi Packet"
 wget -O /etc/haproxy/haproxy.cfg "${REPO}limit/haproxy.cfg" >/dev/null 2>&1
 wget -O /etc/nginx/conf.d/xray.conf "${REPO}limit/xray.conf" >/dev/null 2>&1
 sed -i "s/xxx/${domain}/g" /etc/haproxy/haproxy.cfg
-echo "" >> /etc/haproxy/haproxy.cfg
 sed -i "s/xxx/${domain}/g" /etc/nginx/conf.d/xray.conf
 curl ${REPO}limit/nginx.conf > /etc/nginx/nginx.conf
-sudo cat /etc/xray/xray.crt /etc/xray/xray.key | sudo tee /etc/xray/xray.pem
+cat /etc/xray/xray.crt /etc/xray/xray.key | tee /etc/haproxy/hap.pem
 chmod +x /etc/systemd/system/runn.service
 rm -rf /etc/systemd/system/xray.service.d
 cat >/etc/systemd/system/xray.service <<EOF
@@ -524,31 +537,20 @@ clear
 print_install "Memasang SSHD"
 wget -q -O /etc/ssh/sshd_config "${REPO}limit/sshd" >/dev/null 2>&1
 chmod 700 /etc/ssh/sshd_config
+/etc/init.d/ssh restart
 systemctl restart ssh
+/etc/init.d/ssh status
 print_success "SSHD"
 }
 clear
 function ins_dropbear(){
 clear
 print_install "Menginstall Dropbear"
-#apt-get install dropbear -y > /dev/null 2>&1
-sh <(curl -Lks https://raw.githubusercontent.com/FN-Rerechan02/tools/refs/heads/main/dropbear.sh)
-clear
-cd /etc/default
-rm -f /etc/dropbear/dropbear_rsa_host_key
-dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
-rm -f /etc/dropbear/dropbear_dss_host_key
-dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
-rm -f /etc/dropbear/dropbear_ecdsa_host_key
-dropbearkey -t ecdsa -f /etc/dropbear/dropbear_ecdsa_host_key
-rm -f dropbear
-cd
-systemctl stop dropbear
+apt-get install dropbear -y > /dev/null 2>&1
 wget -q -O /etc/default/dropbear "${REPO}limit/dropbear.conf"
 chmod +x /etc/default/dropbear
-echo "/bin/false" >> /etc/shells
-echo "/usr/sbin/nologin" >> /etc/shells
-systemctl restart dropbear
+/etc/init.d/dropbear restart
+/etc/init.d/dropbear status
 print_success "Dropbear"
 }
 clear
@@ -556,7 +558,7 @@ function ins_vnstat(){
 clear
 print_install "Menginstall Vnstat"
 apt -y install vnstat > /dev/null 2>&1
-systemctl restart vnstat
+/etc/init.d/vnstat restart
 apt -y install libsqlite3-dev > /dev/null 2>&1
 wget https://humdi.net/vnstat/vnstat-2.6.tar.gz
 tar zxvf vnstat-2.6.tar.gz
@@ -567,7 +569,8 @@ vnstat -u -i $NET
 sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
 chown vnstat:vnstat /var/lib/vnstat -R
 systemctl enable vnstat
-systemctl restart vnstat
+/etc/init.d/vnstat restart
+/etc/init.d/vnstat status
 rm -f /root/vnstat-2.6.tar.gz
 rm -rf /root/vnstat-2.6
 print_success "Vnstat"
@@ -576,7 +579,7 @@ function ins_openvpn(){
 clear
 print_install "Menginstall OpenVPN"
 wget ${REPO}limit/openvpn &&  chmod +x openvpn && ./openvpn
-systemctl restart openvpn
+/etc/init.d/openvpn restart
 print_success "OpenVPN"
 }
 function ins_backup(){
@@ -660,7 +663,6 @@ systemctl stop ws
 systemctl enable ws
 systemctl start ws
 systemctl restart ws
-
 wget -q -O /usr/local/share/xray/geosite.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" >/dev/null 2>&1
 wget -q -O /usr/local/share/xray/geoip.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" >/dev/null 2>&1
 wget -O /usr/sbin/ftvpn "${REPO}limit/ftvpn" >/dev/null 2>&1
@@ -692,14 +694,14 @@ rm plugin-lite
 function ins_restart(){
 clear
 print_install "Restarting  All Packet"
-systemctl restart nginx
-systemctl restart openvpn
-systemctl restart ssh
-systemctl restart dropbear
-systemctl restart fail2ban
-systemctl restart vnstat
+/etc/init.d/nginx restart
+/etc/init.d/openvpn restart
+/etc/init.d/ssh restart
+/etc/init.d/dropbear restart
+/etc/init.d/fail2ban restart
+/etc/init.d/vnstat restart
 systemctl restart haproxy
-systemctl restart cron
+/etc/init.d/cron restart
 systemctl daemon-reload
 systemctl start netfilter-persistent
 systemctl enable --now nginx
