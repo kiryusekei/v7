@@ -660,33 +660,6 @@ systemctl enable ws
 systemctl start ws
 systemctl restart ws
 
-# iNSTALL WS RERECHAN
-wget -O /usr/local/bin/proxy "https://raw.githubusercontent.com/FN-Rerechan02/tools/refs/heads/main/proxy"
-chmod +x /usr/local/bin/proxy
-echo -e '[Unit]
-Description=Websocket By Rerecha02
-Documentation=https://t.me/project_rerechan
-After=network.target nss-lookup.target
-
-[Service]
-Type=simple
-User=root
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-NoNewPrivileges=true
-Restart=on-failure
-ExecStart=/usr/local/bin/proxy
-LimitNPROC=10000
-LimitNOFILE=1000000
-
-[Install]
-WantedBy=multi-user.target' > /etc/systemd/system/proxy.service
-echo -e 'HTTP/1.1 101 <b><font color="blue">Rerechan Project</font></b>\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n' > /etc/proxy.txt
-chmod +x /etc/proxy.txt
-systemctl daemon-reload
-systemctl start proxy
-systemctl enable proxy
-
 wget -q -O /usr/local/share/xray/geosite.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" >/dev/null 2>&1
 wget -q -O /usr/local/share/xray/geoip.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" >/dev/null 2>&1
 wget -O /usr/sbin/ftvpn "${REPO}limit/ftvpn" >/dev/null 2>&1
