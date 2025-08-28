@@ -28,35 +28,32 @@ export IP=$( curl -sS icanhazip.com )
 clear
 clear && clear && clear
 clear;clear;clear
-echo -e "${YELLOW}----------------------------------------------------------${NC}"
-echo -e "  Welcome To SCRIPT ${YELLOW}(${NC}${green} Stable Edition ${NC}${YELLOW})${NC}"
-echo -e " This Will Quick Setup VPN Server On Your Server"
-echo -e "  Auther : ${green} PEYX ® ${NC}${YELLOW}(${NC} ${green} ZNTUNNEL ${NC}${YELLOW})${NC}"
-echo -e " © Recode By My Self PEYX ${YELLOW}(${NC} 2023 ${YELLOW})${NC}"
-echo -e "${YELLOW}----------------------------------------------------------${NC}"
+echo -e "${BIWhite}----------------------------------------------------------${NC}"  
+echo -e "Script Tunneling VPN Premium Kiryu Project${NC}"
+echo -e "${BIWhite}----------------------------------------------------------${NC}"
 echo ""
 sleep 2
 if [[ $( uname -m | awk '{print $1}' ) == "x86_64" ]]; then
-echo -e "${OK} Your Architecture Is Supported ( ${green}$( uname -m )${NC} )"
+echo -e "${BIWhite} Your Architecture Is Supported ( ${ungu}$( uname -m )${NC} )"
 else
-echo -e "${EROR} Your Architecture Is Not Supported ( ${YELLOW}$( uname -m )${NC} )"
+echo -e "${BIWhite} Your Architecture Is Not Supported ( ${BIYellow}$( uname -m )${NC} )"
 exit 1
 fi
 if [[ $( cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g' ) == "ubuntu" ]]; then
-echo -e "${OK} Your OS Is Supported ( ${green}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
+echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
 elif [[ $( cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g' ) == "debian" ]]; then
-echo -e "${OK} Your OS Is Supported ( ${green}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
+echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
 else
-echo -e "${EROR} Your OS Is Not Supported ( ${YELLOW}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
+echo -e "${BIWhite} Your OS Is Not Supported ( ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
 exit 1
 fi
 if [[ $IP == "" ]]; then
-echo -e "${EROR} IP Address ( ${YELLOW}Not Detected${NC} )"
+echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected${NC} )"
 else
-echo -e "${OK} IP Address ( ${green}$IP${NC} )"
+echo -e "${BIWhite} IP Address ( ${ungu}$IP${NC} )"
 fi
 echo ""
-read -p "$( echo -e "Press ${GRAY}[ ${NC}${green}Enter${NC} ${GRAY}]${NC} For Starting Installation") "
+read -p "$( echo -e "Press ${BIWhite}[ ${NC}${LIME}Enter${NC} ${BIWhite}]${NC} For Starting Installation") "
 echo ""
 clear
 if [ "${EUID}" -ne 0 ]; then
@@ -116,9 +113,9 @@ function print_ok() {
 echo -e "${OK} ${BLUE} $1 ${FONT}"
 }
 function print_install() {
-echo -e "${green} =============================== ${FONT}"
-echo -e "${YELLOW} # $1 ${FONT}"
-echo -e "${green} =============================== ${FONT}"
+echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
+echo -e "${BIYellow}» $1 ${FONT}"
+echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
 sleep 1
 }
 function print_error() {
@@ -126,9 +123,9 @@ echo -e "${ERROR} ${REDBG} $1 ${FONT}"
 }
 function print_success() {
 if [[ 0 -eq $? ]]; then
-echo -e "${green} =============================== ${FONT}"
-echo -e "${Green} # $1 berhasil dipasang"
-echo -e "${green} =============================== ${FONT}"
+echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
+echo -e "${LIME}» $1 berhasil dipasang"
+echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
 sleep 2
 fi
 }
@@ -574,7 +571,6 @@ tar zxvf vnstat-2.6.tar.gz
 cd vnstat-2.6
 ./configure --prefix=/usr --sysconfdir=/etc && make && make install
 cd
-vnstat -u -i $NET
 sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
 chown vnstat:vnstat /var/lib/vnstat -R
 systemctl enable vnstat
@@ -646,12 +642,10 @@ print_success "Swap 1 G"
 function ins_Fail2ban(){
 clear
 print_install "Menginstall Fail2ban"
-if [ -d '/usr/local/ddos' ]; then
-echo; echo; echo "Please un-install the previous version first"
-exit 0
-else
-mkdir /usr/local/ddos
-fi
+apt update -y 
+apt install -y fail2ban 
+systemctl enable --now fail2ban 
+systemctl restart fail2ban 
 clear
 echo "Banner /etc/kyt.txt" >>/etc/ssh/sshd_config
 sed -i 's@DROPBEAR_BANNER=""@DROPBEAR_BANNER="/etc/kyt.txt"@g' /etc/default/dropbear
