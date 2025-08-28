@@ -48,9 +48,9 @@ echo -e "${BIWhite} Your OS Is Not Supported ( ${BIYellow}$( cat /etc/os-release
 exit 1
 fi
 if [[ $IP == "" ]]; then
-echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected$ ${BIWhite})${NC}"
+echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected ${BIWhite})${NC}"
 else
-echo -e "${BIWhite} IP Address ( ${ungu}$IP$ ${BIWhite})${NC}"
+echo -e "${BIWhite} IP Address ( ${ungu}$IP ${BIWhite})${NC}"
 fi
 echo ""
 read -p "$( echo -e "${BIWhite}Tekan ${BIYellow}[ ${NC}${ungu}Enter${NC} ${BIYellow}]${NC} ${BIWhite}Untuk Memulai Pemasangan${NC}")"
