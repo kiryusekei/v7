@@ -29,7 +29,7 @@ clear
 clear && clear && clear
 clear;clear;clear
 echo -e "${BIWhite}----------------------------------------------------------${NC}"  
-echo -e "Script Tunneling VPN Premium Kiryu Project${NC}"
+echo -e "${LIME}Script Tunneling VPN Premium Kiryu Project${NC}"
 echo -e "${BIWhite}----------------------------------------------------------${NC}"
 echo ""
 sleep 2
@@ -53,7 +53,7 @@ else
 echo -e "${BIWhite} IP Address ( ${ungu}$IP${NC} )"
 fi
 echo ""
-read -p "$( echo -e "Press ${BIWhite}[ ${NC}${LIME}Enter${NC} ${BIWhite}]${NC} For Starting Installation") "
+read -p "$( echo -e "${ungu}Press ${BIWhite}[ ${NC}${LIME}Enter${NC} ${BIWhite}]${NC} ${ungu}For Starting Installation${NC}") "
 echo ""
 clear
 if [ "${EUID}" -ne 0 ]; then
@@ -68,11 +68,6 @@ red='\e[1;31m'
 green='\e[0;32m'
 NC='\e[0m'
 MYIP=$(curl -sS ipv4.icanhazip.com)
-echo -e "\e[32mloading...\e[0m"
-clear
-MYIP=$(curl -sS ipv4.icanhazip.com)
-echo -e "\e[32mloading...\e[0m"
-clear
 clear
 rm -f /usr/bin/user
 username=$(curl https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep $MYIP | awk '{print $2}')
@@ -114,7 +109,7 @@ echo -e "${OK} ${BLUE} $1 ${FONT}"
 }
 function print_install() {
 echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
-echo -e "${BIYellow}» $1 ${FONT}"
+echo -e "${BIYellow}» $1 ${NC}"
 echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
 sleep 1
 }
@@ -124,7 +119,7 @@ echo -e "${ERROR} ${REDBG} $1 ${FONT}"
 function print_success() {
 if [[ 0 -eq $? ]]; then
 echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
-echo -e "${LIME}» $1 berhasil dipasang"
+echo -e "${LIME}» $1 berhasil dipasang ${NC}""
 echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
 sleep 2
 fi
