@@ -265,24 +265,31 @@ function pasang_domain() {
     print_success "Hore Domain Mu"
 }
 restart_system(){
-USRSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep $MYIP | awk '{print $2}')
-EXPSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep $MYIP | awk '{print $3}')
+USRSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep "$MYIP" | awk '{print $2}')
+EXPSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep "$MYIP" | awk '{print $3}')
 TIMEZONE=$(printf '%(%H:%M:%S)T')
-TEXT="
+domain=$(cat /etc/xray/domain)
+
+read -r -d '' TEXT <<EOF
 <code>────────────────────</code>
-<b> 💥AUTOSCRIPT PREMIUM💥</b>
+<b> ❇️AUTOSCRIPT PREMIUM❇️</b>
 <code>────────────────────</code>
-💥 » <code>Owner  :</code><code>$username</code>
-💥 » <code>Domain :</code><code>$domain</code>
-💥 » <code>IPVPS  :</code><code>$IP</code>
+🏷️ » <code>Client :</code><code>$username</code>
+🏷️ » <code>Domain :</code><code>$domain</code>
+🏷️ » <code>IP VPS :</code><code>$IP</code>
 <code>────────────────────</code>
 <b> SCRIPT NOTIF </b>
 <code>────────────────────</code>
 <i>Automatic Notifications From Github</i>
-"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ","url":"https://wa.me/6287744622208"}]]}'
-curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
+EOF
+
+curl -s --max-time "$TIMES" \
+  -d "chat_id=$CHATID" \
+  --data-urlencode "text=$TEXT" \
+  -d "parse_mode=html" \
+  -d 'reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ","url":"https://wa.me/6287744622208"}]]}' \
+  "$URL" >/dev/null
 }
-clear
 function pasang_ssl() {
 clear
 print_install "Memasang SSL Pada Domain"
