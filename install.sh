@@ -19,10 +19,6 @@ WHITE='\033[1;37m'
 LIME='\e[38;5;155m'
 ungu="\e[38;5;99m"
 NC='\033[0m'
-TIMES="10"
-CHATID="1210833546"
-KEY="6006599143:AAEgstCAioq35JgX97HaW_G3TAkLKzLZS_w"
-URL="https://api.telegram.org/bot$KEY/sendMessage"
 clear
 export IP=$( curl -sS icanhazip.com )
 clear
@@ -68,6 +64,11 @@ red='\e[1;31m'
 green='\e[0;32m'
 NC='\e[0m'
 MYIP=$(curl -sS ipv4.icanhazip.com)
+echo -e "\e[32mloading...\e[0m"
+clear
+MYIP=$(curl -sS ipv4.icanhazip.com)
+echo -e "\e[32mloading...\e[0m"
+clear
 clear
 rm -f /usr/bin/user
 username=$(curl https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep $MYIP | awk '{print $2}')
@@ -119,7 +120,7 @@ echo -e "${ERROR} ${REDBG} $1 ${FONT}"
 function print_success() {
 if [[ 0 -eq $? ]]; then
 echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
-echo -e "${LIME}» $1 berhasil dipasang ${NC}""
+echo -e "${LIME}» $1 berhasil dipasang ${NC}"
 echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
 sleep 2
 fi
@@ -162,10 +163,30 @@ timedatectl set-timezone Asia/Jakarta
 echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
 echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
 print_success "Directory Xray"
+#if [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "ubuntu" ]]; then
+#echo "Setup Dependencies $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
+#sudo apt update -y
 apt install --no-install-recommends software-properties-common
 apt install haproxy -y
 apt install dos2unix -y
+apt install sudo -y
+#add-apt-repository ppa:vbernat/haproxy-2.0 -y
+#apt -y install haproxy=2.0.\*
+#elif [[ $(cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g') == "debian" ]]; then
+#echo "Setup Dependencies For OS Is $(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g')"
+#curl https://haproxy.debian.net/bernat.debian.org.gpg |
+#gpg --dearmor >/usr/share/keyrings/haproxy.debian.net.gpg
+#echo deb "[signed-by=/usr/share/keyrings/haproxy.debian.net.gpg]" \
+#http://haproxy.debian.net buster-backports-1.8 main \
+#>/etc/apt/sources.list.d/haproxy.list
+#sudo apt update
+#apt -y install haproxy=1.8.\*
+#else
+#echo -e " Your OS Is Not Supported ($(cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g') )"
+#exit 1
+#fi
 }
+clear
 function nginx_install() {
     clear
     print_install "Memasang Nginx & konfigurasinya"
@@ -191,105 +212,97 @@ types {
     application/json                      json;
     application/zip                       zip;
     application/x-7z-compressed           7z;
-    
-    }
+}
 EOL
 }
 function base_package() {
-    clear
-    print_install "Memasang Paket Dasar"
-    export DEBIAN_FRONTEND=noninteractive
-    apt update -y
-    apt upgrade -y
-    apt dist-upgrade -y
-    apt install -y at zip pwgen openssl htop netcat-openbsd socat cron bash-completion figlet ruby wondershaper
-    gem install lolcat
-    apt install -y iptables iptables-persistent
-    apt install -y ntpdate chrony
-    ntpdate pool.ntp.org
-    systemctl enable netfilter-persistent
-    systemctl restart netfilter-persistent
-    systemctl enable --now chrony
-    systemctl restart chrony
-    chronyc sourcestats -v
-    chronyc tracking -v
-    apt install -y --no-install-recommends software-properties-common
-    echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
-    echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
-    apt install -y \
-      speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev \
-      libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools \
-      libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr \
-      libxml-parser-perl build-essential gcc g++ python3 htop lsof tar wget curl git \
-      unzip p7zip-full libc6 util-linux msmtp-mta ca-certificates bsd-mailx \
-      netfilter-persistent net-tools gnupg lsb-release cmake screen xz-utils apt-transport-https dnsutils jq easy-rsa
-    apt clean
-    apt autoremove -y
-    apt remove --purge -y exim4 ufw firewalld
-    print_success "Paket Dasar"
+clear
+print_install "Memasang Paket Dasar"
+apt update -y
+apt upgrade -y
+apt dist-upgrade -y
+apt install -y at zip pwgen openssl htop netcat-openbsd socat cron bash-completion figlet ruby wondershaper
+gem install lolcat
+apt install -y iptables iptables-persistent
+apt install -y ntpdate chrony
+ntpdate pool.ntp.org
+systemctl enable netfilter-persistent
+systemctl restart netfilter-persistent
+systemctl enable --now chrony
+systemctl restart chrony
+chronyc sourcestats -v
+chronyc tracking -v
+apt install -y --no-install-recommends software-properties-common
+echo iptables-persistent iptables-persistent/autosave_v4 boolean true | debconf-set-selections
+echo iptables-persistent iptables-persistent/autosave_v6 boolean true | debconf-set-selections
+apt install -y \
+  speedtest-cli vnstat libnss3-dev libnspr4-dev pkg-config libpam0g-dev \
+  libcap-ng-dev libcap-ng-utils libselinux1-dev libcurl4-nss-dev flex bison make libnss3-tools \
+  libevent-dev bc rsyslog dos2unix zlib1g-dev libssl-dev libsqlite3-dev sed dirmngr \
+  libxml-parser-perl build-essential gcc g++ python3 htop lsof tar wget curl git \
+  unzip p7zip-full libc6 util-linux msmtp-mta ca-certificates bsd-mailx \
+  netfilter-persistent net-tools gnupg lsb-release cmake screen xz-utils apt-transport-https dnsutils jq easy-rsa
+apt clean
+apt autoremove -y
+apt remove --purge -y exim4 ufw firewalld
+print_success "Paket Dasar"
 }
 function pasang_domain() {
-    clear
-    print_install "Silahkan Atur Domain Anda"
-    echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
-    echo -e "${LIME}            Setup domain Menu         ${NC}"
-    echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
-    echo -e "${LIME}[${BIWhite}01${LIME}]${BIWhite} Menggunakan Domain Sendiri${NC}"
-    echo -e "${LIME}[${BIWhite}02${LIME}]${BIWhite} Menggunakan Domain Bawaan Dari Script${NC}"
-    echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
-    echo -e ""
-    while true; do
-        read -p "Silahkan Pilih Opsi 1 Atau 2: " host
-        echo ""
-        if [[ $host == "1" ]]; then
-            read -p "Silahkan Masukan Domain Mu: " host1
-            echo "IP=" >> /var/lib/kyt/ipvps.conf
-            echo $host1 > /etc/xray/domain
-            echo $host1 > /root/domain
-            echo -e "${BIWhite}Subdomain $host1 Mu Berhasil Di Atur${NC}"
-            echo ""
-            break
-        elif [[ $host == "2" ]]; then
-            echo -e "${BIWhite}Mengatur Subdomain Mu${NC}"
-            wget -q ${REPO}limit/cf.sh && chmod +x cf.sh && ./cf.sh
-            rm -f /root/cloudflare
-            clear
-            echo -e "${BIWhite}Subdomain Mu Berhasil Di Atur${NC}"
-            break
-        else
-            echo -e "${RED}Pilihan Mu Tidak Valid! Harap Pilih Angka 1 Atau 2.${NC}"
-            echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
-        fi
-    done
-    
-    print_success "Hore Domain Mu"
-}
-restart_system(){
-USRSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep "$MYIP" | awk '{print $2}')
-EXPSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep "$MYIP" | awk '{print $3}')
-TIMEZONE=$(printf '%(%H:%M:%S)T')
-domain=$(cat /etc/xray/domain)
+clear
+print_install "Silahkan Atur Domain Anda"
+echo -e "${BIWhite}┌──────────────────────────────────────┐${NC}"
+echo -e "${LIME}Setup domain Menu ${NC}"
+echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
+echo -e "${LIME}[${BIWhite}01${LIME}]${BIWhite} Menggunakan Domain Sendiri${NC}"
+echo -e "${LIME}[${BIWhite}02${LIME}]${BIWhite} Menggunakan Domain Bawaan Dari Script${NC}"
+echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
+echo -e ""
+while true; do
+read -p "Silahkan Pilih Opsi 1 Atau 2: " host
+echo ""
+if [[ $host == "1" ]]; then
+read -p "Silahkan Masukan Domain Mu: " host1
+echo "IP=" >> /var/lib/kyt/ipvps.conf
+echo $host1 > /etc/xray/domain
+echo $host1 > /root/domain
+echo -e "${BIWhite}Subdomain $host1 Mu Berhasil Di Atur${NC}"
+echo ""
+break
+elif [[ $host == "2" ]]; then
+echo -e "${BIWhite}Mengatur Subdomain Mu${NC}"
+wget -q ${REPO}limit/cf.sh && chmod +x cf.sh && ./cf.sh
+rm -f /root/cloudflare
+clear
+echo -e "${BIWhite}Subdomain Mu Berhasil Di Atur${NC}"
+break
+else
+echo -e "${RED}Pilihan Mu Tidak Valid! Harap Pilih Angka 1 Atau 2.${NC}"
+echo -e "${BIWhite}└──────────────────────────────────────┘${NC}"
+fi
+done
 
-read -r -d '' TEXT <<EOF
+print_success "Hore Domain Mu"
+}
+clear
+restart_system(){
+USRSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep $MYIP | awk '{print $2}')
+EXPSC=$(curl -sS https://raw.githubusercontent.com/kiryusekei/izinvps/main/ip | grep $MYIP | awk '{print $3}')
+TIMEZONE=$(printf '%(%H:%M:%S)T')
+TEXT="
 <code>────────────────────</code>
-<b> ❇️AUTOSCRIPT PREMIUM❇️</b>
+<b> 💥AUTOSCRIPT PREMIUM💥</b>
 <code>────────────────────</code>
-🏷️ » <code>Client :</code><code>$username</code>
-🏷️ » <code>Domain :</code><code>$domain</code>
-🏷️ » <code>IP VPS :</code><code>$IP</code>
+💥 » <code>Owner  :</code><code>$username</code>
+💥 » <code>Domain :</code><code>$domain</code>
+💥 » <code>IPVPS  :</code><code>$IP</code>
 <code>────────────────────</code>
 <b> SCRIPT NOTIF </b>
 <code>────────────────────</code>
 <i>Automatic Notifications From Github</i>
-EOF
-
-curl -s --max-time "$TIMES" \
-  -d "chat_id=$CHATID" \
-  --data-urlencode "text=$TEXT" \
-  -d "parse_mode=html" \
-  -d 'reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ","url":"https://wa.me/6287744622208"}]]}' \
-  "$URL" >/dev/null
+"'&reply_markup={"inline_keyboard":[[{"text":"ᴏʀᴅᴇʀ","url":"https://wa.me/6287744622208"}]]}'
+curl -s --max-time $TIMES -d "chat_id=$CHATID&disable_web_page_preview=1&text=$TEXT&parse_mode=html" $URL >/dev/null
 }
+clear
 function pasang_ssl() {
 clear
 print_install "Memasang SSL Pada Domain"
@@ -353,7 +366,7 @@ echo "& plughin Account" >>/etc/ssh/.ssh.db
 }
 function install_xray() {
 clear
-print_install "Core Xray 1.8.1 Latest Version"
+print_install "Core Xray Latest Version"
 domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
 chown www-data.www-data $domainSock_dir
 latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
@@ -362,7 +375,7 @@ wget -O /etc/xray/config.json "${REPO}limit/config.json" >/dev/null 2>&1
 wget -O /etc/systemd/system/runn.service "${REPO}limit/runn.service" >/dev/null 2>&1
 domain=$(cat /etc/xray/domain)
 IPVS=$(cat /etc/xray/ipvps)
-print_success "Core Xray 1.8.1 Latest Version"
+print_success "Core Xray Latest Version"
 clear
 curl -s ipinfo.io/city >>/etc/xray/city
 curl -s ipinfo.io/org | cut -d " " -f 2-10 >>/etc/xray/isp
@@ -394,48 +407,36 @@ WantedBy=multi-user.target
 EOF
 print_success "Konfigurasi Packet"
 }
-function ssh() {
-    set -e
-    clear
-    print_install "Memasang Password SSH"
-
-    # Pastikan alat yang dibutuhkan ada
-    apt-get update -y
-    apt-get install -y debconf-utils keyboard-configuration
-
-    # Pasang policy password (tidak perlu executable bit)
-    wget -O /etc/pam.d/common-password "${REPO}limit/password"
-    chmod 644 /etc/pam.d/common-password
-
-    # Preseed keyboard-configuration (pakai printf | debconf-set-selections)
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/compose select No compose key' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/ctrl_alt_bksp boolean false' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/layoutcode string de' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/layout select English' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/modelcode string pc105' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/model select Generic 105-key (Intl) PC' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/optionscode string ' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/switch select No temporary switch' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/toggle select No toggling' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_config_layout boolean true' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_config_options boolean true' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_layout boolean true' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_options boolean true' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/variantcode string ' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/variant select English' | debconf-set-selections
-    printf '%s\n' 'keyboard-configuration keyboard-configuration/xkb-keymap select ' | debconf-set-selections
-
-    # Non-interaktif reconfigure SETELAH di-preseed
-    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
-
-    # --- rc-local.service (bikin jika belum ada) ---
-    cat >/etc/systemd/system/rc-local.service <<'END'
+function ssh(){
+clear
+print_install "Memasang Password SSH"
+wget -O /etc/pam.d/common-password "${REPO}limit/password"
+chmod +x /etc/pam.d/common-password
+DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/compose select No compose key"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/ctrl_alt_bksp boolean false"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layoutcode string de"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layout select English"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/modelcode string pc105"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/model select Generic 105-key (Intl) PC"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/optionscode string "
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/switch select No temporary switch"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/toggle select No toggling"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_layout boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_options boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_layout boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_options boolean true"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variantcode string "
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variant select English"
+debconf-set-selections <<<"keyboard-configuration keyboard-configuration/xkb-keymap select "
+cd
+# Edit file /etc/systemd/system/rc-local.service
+cat > /etc/systemd/system/rc-local.service <<-END
 [Unit]
 Description=/etc/rc.local
 ConditionPathExists=/etc/rc.local
-
 [Service]
 Type=forking
 ExecStart=/etc/rc.local start
@@ -443,32 +444,36 @@ TimeoutSec=0
 StandardOutput=tty
 RemainAfterExit=yes
 SysVStartPriority=99
-
 [Install]
 WantedBy=multi-user.target
 END
 
-    # /etc/rc.local
-    cat >/etc/rc.local <<'END'
+# nano /etc/rc.local
+cat > /etc/rc.local <<-END
 #!/bin/sh -e
 # rc.local
 # By default this script does nothing.
 exit 0
 END
-    chmod +x /etc/rc.local
 
-    systemctl enable rc-local
-    systemctl start rc-local.service
+# Ubah izin akses
+chmod +x /etc/rc.local
 
-    # Disable IPv6 on boot
-    echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-    sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+# enable rc local
+systemctl enable rc-local
+systemctl start rc-local.service
 
-    # Timezone & SSH minor tweak
-    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-    sed -i 's/^[[:space:]]*AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
+# disable ipv6
+echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 
-    print_success "Password SSH"
+#update
+# set time GMT +7
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+
+# set locale
+sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
+print_success "Password SSH"
 }
 function udp_mini(){
 clear
@@ -565,7 +570,7 @@ clear
 function ins_dropbear(){
 clear
 print_install "Menginstall Dropbear"
-apt install dropbear -y 
+apt install dropbear -y
 wget -q -O /etc/default/dropbear "${REPO}limit/dropbear.conf"
 chmod +x /etc/default/dropbear
 systemctl restart dropbear
@@ -584,6 +589,7 @@ tar zxvf vnstat-2.6.tar.gz
 cd vnstat-2.6
 ./configure --prefix=/usr --sysconfdir=/etc && make && make install
 cd
+vnstat -u -i $NET
 sed -i 's/Interface "'""eth0""'"/Interface "'""$NET""'"/g' /etc/vnstat.conf
 chown vnstat:vnstat /var/lib/vnstat -R
 systemctl enable vnstat
