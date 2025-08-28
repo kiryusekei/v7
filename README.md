@@ -9,7 +9,6 @@ apt update -y && apt upgrade -y --fix-missing && apt install -y xxd bzip2 wget c
 - step 2
 ```
 screen -S setup-session bash -c "wget -q https://raw.githubusercontent.com/kiryusekei/v7/main/install.sh && chmod +x install.sh && ./install.sh; read -p 'Tekan enter untuk keluar...'"
-
 ```
 
 **Perintah Untuk Menghubungkan Ulang Jika Disconnected saat pemasangan**
