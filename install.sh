@@ -34,26 +34,26 @@ echo -e "${BIWhite}----------------------------------------------------------${N
 echo ""
 sleep 2
 if [[ $( uname -m | awk '{print $1}' ) == "x86_64" ]]; then
-echo -e "${BIWhite} Your Architecture Is Supported ( ${ungu}$( uname -m )${NC} )"
+echo -e "${BIWhite} Your Architecture Is Supported ( ${ungu}$( uname -m ) )${NC}"
 else
-echo -e "${BIWhite} Your Architecture Is Not Supported ( ${BIYellow}$( uname -m )${NC} )"
+echo -e "${BIWhite} Your Architecture Is Not Supported ( ${BIYellow}$( uname -m ) )${NC}"
 exit 1
 fi
 if [[ $( cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g' ) == "ubuntu" ]]; then
-echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
+echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) )${NC}"
 elif [[ $( cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g' ) == "debian" ]]; then
-echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
+echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) )${NC}"
 else
-echo -e "${BIWhite} Your OS Is Not Supported ( ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' )${NC} )"
+echo -e "${BIWhite} Your OS Is Not Supported ( ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) )${NC}"
 exit 1
 fi
 if [[ $IP == "" ]]; then
-echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected${NC} )"
+echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected$ )${NC}"
 else
-echo -e "${BIWhite} IP Address ( ${ungu}$IP${NC} )"
+echo -e "${BIWhite} IP Address ( ${ungu}$IP$ )${NC}"
 fi
 echo ""
-read -p "$( echo -e "${ungu}Press ${BIWhite}[ ${NC}${LIME}Enter${NC} ${BIWhite}]${NC} ${ungu}For Starting Installation${NC}") "
+read -p "$( echo -e "${BIWhite}Tekan ${BIYellow}[ ${NC}${ungu}Enter${NC} ${BIYellow}]${NC} ${BIWhite}Untuk Memulai Pemasangan${NC}") "
 echo ""
 clear
 if [ "${EUID}" -ne 0 ]; then
@@ -191,6 +191,9 @@ types {
     application/json                      json;
     application/zip                       zip;
     application/x-7z-compressed           7z;
+    
+    }
+EOL
 }
 function base_package() {
     clear
