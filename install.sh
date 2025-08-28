@@ -34,26 +34,26 @@ echo -e "${BIWhite}----------------------------------------------------------${N
 echo ""
 sleep 2
 if [[ $( uname -m | awk '{print $1}' ) == "x86_64" ]]; then
-echo -e "${BIWhite} Your Architecture Is Supported ( ${ungu}$( uname -m ) )${NC}"
+echo -e "${BIWhite} Your Architecture Is Supported ( ${ungu}$( uname -m ) ${BIWhite})${NC}"
 else
-echo -e "${BIWhite} Your Architecture Is Not Supported ( ${BIYellow}$( uname -m ) )${NC}"
+echo -e "${BIWhite} Your Architecture Is Not Supported ( ${BIYellow}$( uname -m ) ${BIWhite})${NC}"
 exit 1
 fi
 if [[ $( cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g' ) == "ubuntu" ]]; then
-echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) )${NC}"
+echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) ${BIWhite})${NC}"
 elif [[ $( cat /etc/os-release | grep -w ID | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/ID//g' ) == "debian" ]]; then
-echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) )${NC}"
+echo -e "${BIWhite} Your OS Is Supported ( ${ungu}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) ${BIWhite})${NC}"
 else
-echo -e "${BIWhite} Your OS Is Not Supported ( ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) )${NC}"
+echo -e "${BIWhite} Your OS Is Not Supported ( ${BIYellow}$( cat /etc/os-release | grep -w PRETTY_NAME | head -n1 | sed 's/=//g' | sed 's/"//g' | sed 's/PRETTY_NAME//g' ) ${BIWhite})${NC}"
 exit 1
 fi
 if [[ $IP == "" ]]; then
-echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected$ )${NC}"
+echo -e "${BIWhite} IP Address ( ${BIYellow}Not Detected$ ${BIWhite})${NC}"
 else
-echo -e "${BIWhite} IP Address ( ${ungu}$IP$ )${NC}"
+echo -e "${BIWhite} IP Address ( ${ungu}$IP$ ${BIWhite})${NC}"
 fi
 echo ""
-read -p "$( echo -e "${BIWhite}Tekan ${BIYellow}[ ${NC}${ungu}Enter${NC} ${BIYellow}]${NC} ${BIWhite}Untuk Memulai Pemasangan${NC}") "
+read -p "$( echo -e "${BIWhite}Tekan ${BIYellow}[ ${NC}${ungu}Enter${NC} ${BIYellow}]${NC} ${BIWhite}Untuk Memulai Pemasangan${NC}")"
 echo ""
 clear
 if [ "${EUID}" -ne 0 ]; then
@@ -394,36 +394,48 @@ WantedBy=multi-user.target
 EOF
 print_success "Konfigurasi Packet"
 }
-function ssh(){
-clear
-print_install "Memasang Password SSH"
-wget -O /etc/pam.d/common-password "${REPO}limit/password"
-chmod +x /etc/pam.d/common-password
-DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/compose select No compose key"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/ctrl_alt_bksp boolean false"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layoutcode string de"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/layout select English"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/modelcode string pc105"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/model select Generic 105-key (Intl) PC"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/optionscode string "
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/switch select No temporary switch"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/toggle select No toggling"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_layout boolean true"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_config_options boolean true"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_layout boolean true"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/unsupported_options boolean true"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variantcode string "
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/variant select English"
-debconf-set-selections <<<"keyboard-configuration keyboard-configuration/xkb-keymap select "
-cd
-# Edit file /etc/systemd/system/rc-local.service
-cat > /etc/systemd/system/rc-local.service <<-END
+function ssh() {
+    set -e
+    clear
+    print_install "Memasang Password SSH"
+
+    # Pastikan alat yang dibutuhkan ada
+    apt-get update -y
+    apt-get install -y debconf-utils keyboard-configuration
+
+    # Pasang policy password (tidak perlu executable bit)
+    wget -O /etc/pam.d/common-password "${REPO}limit/password"
+    chmod 644 /etc/pam.d/common-password
+
+    # Preseed keyboard-configuration (pakai printf | debconf-set-selections)
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/altgr select The default for the keyboard layout' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/compose select No compose key' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/ctrl_alt_bksp boolean false' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/layoutcode string de' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/layout select English' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/modelcode string pc105' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/model select Generic 105-key (Intl) PC' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/optionscode string ' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/store_defaults_in_debconf_db boolean true' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/switch select No temporary switch' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/toggle select No toggling' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_config_layout boolean true' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_config_options boolean true' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_layout boolean true' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/unsupported_options boolean true' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/variantcode string ' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/variant select English' | debconf-set-selections
+    printf '%s\n' 'keyboard-configuration keyboard-configuration/xkb-keymap select ' | debconf-set-selections
+
+    # Non-interaktif reconfigure SETELAH di-preseed
+    DEBIAN_FRONTEND=noninteractive dpkg-reconfigure keyboard-configuration
+
+    # --- rc-local.service (bikin jika belum ada) ---
+    cat >/etc/systemd/system/rc-local.service <<'END'
 [Unit]
 Description=/etc/rc.local
 ConditionPathExists=/etc/rc.local
+
 [Service]
 Type=forking
 ExecStart=/etc/rc.local start
@@ -431,36 +443,32 @@ TimeoutSec=0
 StandardOutput=tty
 RemainAfterExit=yes
 SysVStartPriority=99
+
 [Install]
 WantedBy=multi-user.target
 END
 
-# nano /etc/rc.local
-cat > /etc/rc.local <<-END
+    # /etc/rc.local
+    cat >/etc/rc.local <<'END'
 #!/bin/sh -e
 # rc.local
 # By default this script does nothing.
 exit 0
 END
+    chmod +x /etc/rc.local
 
-# Ubah izin akses
-chmod +x /etc/rc.local
+    systemctl enable rc-local
+    systemctl start rc-local.service
 
-# enable rc local
-systemctl enable rc-local
-systemctl start rc-local.service
+    # Disable IPv6 on boot
+    echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
+    sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
 
-# disable ipv6
-echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6
-sed -i '$ i\echo 1 > /proc/sys/net/ipv6/conf/all/disable_ipv6' /etc/rc.local
+    # Timezone & SSH minor tweak
+    ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
+    sed -i 's/^[[:space:]]*AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
 
-#update
-# set time GMT +7
-ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-
-# set locale
-sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
-print_success "Password SSH"
+    print_success "Password SSH"
 }
 function udp_mini(){
 clear
