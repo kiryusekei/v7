@@ -19,6 +19,10 @@ WHITE='\033[1;37m'
 LIME='\e[38;5;155m'
 ungu="\e[38;5;99m"
 NC='\033[0m'
+TIMES="10"
+CHATID="1210833546"
+KEY="6006599143:AAEgstCAioq35JgX97HaW_G3TAkLKzLZS_w"
+URL="https://api.telegram.org/bot$KEY/sendMessage"
 clear
 export IP=$( curl -sS icanhazip.com )
 clear
