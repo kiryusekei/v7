@@ -736,7 +736,7 @@ print_install "Memasang Menu Packet"
 wget ${REPO}limit/menu.zip
 unzip menu.zip
 chmod +x menu/*
-mv menu/* /usr/local/sbin
+mv * /usr/bin
 sudo dos2unix /usr/local/sbin/install-plugin
 rm -rf menu
 rm -rf menu.zip
