@@ -681,6 +681,42 @@ systemctl stop ws
 systemctl enable ws
 systemctl start ws
 systemctl restart ws
+
+# Install WebSocket Enhanced
+cd /usr/local/sbin
+wget -O rerechanstore "https://raw.githubusercontent.com/kiryusekei/v7/refs/heads/main/limit/ws.py"
+chmod +x rerechanstore
+cd
+echo -e '[Unit]
+Description=Websocket By Rerecha02
+Documentation=https://t.me/project_rerechan
+After=network.target nss-lookup.target
+
+[Service]
+Type=simple
+User=root
+CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+NoNewPrivileges=true
+Restart=on-failure
+ExecStart=/usr/local/sbin/rerechanstore
+LimitNPROC=10000
+LimitNOFILE=1000000
+
+[Install]
+WantedBy=multi-user.target' > /etc/systemd/system/rere.service
+
+echo -e 'HTTP/1.1 101 <b><font color="blue">Rerechan Store</font></b>\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n' > /etc/proxy.txt
+
+systemctl daemon-reload
+systemctl start rere
+systemctl enable rere
+
+
+
+
+
+
 wget -q -O /usr/local/share/xray/geosite.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" >/dev/null 2>&1
 wget -q -O /usr/local/share/xray/geoip.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" >/dev/null 2>&1
 wget -O /usr/sbin/ftvpn "${REPO}limit/ftvpn" >/dev/null 2>&1
