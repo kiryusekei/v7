@@ -556,9 +556,19 @@ clear
 function ins_dropbear(){
 clear
 print_install "Menginstall Dropbear"
-apt install dropbear -y
+# apt install dropbear -y
+sh <(curl -s https://raw.githubusercontent.com/FN-Rerechan02/tools/refs/heads/main/dropbear.sh)
+cd /etc/default
+rm -f /etc/dropbear/dropbear_rsa_host_key
+dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
+rm -f /etc/dropbear/dropbear_dss_host_key
+dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
+rm -f /etc/dropbear/dropbear_ecdsa_host_key
+dropbearkey -t ecdsa -f /etc/dropbear/dropbear_ecdsa_host_key
 wget -q -O /etc/default/dropbear "${REPO}limit/dropbear.conf"
 chmod +x /etc/default/dropbear
+echo "/bin/false" >> /etc/shells
+echo "/usr/sbin/nologin" >> /etc/shells
 systemctl restart dropbear
 /etc/init.d/dropbear status
 print_success "Dropbear"
