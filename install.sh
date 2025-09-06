@@ -556,8 +556,8 @@ clear
 function ins_dropbear(){
 clear
 print_install "Menginstall Dropbear"
-# apt install dropbear -y
-sh <(curl -s https://raw.githubusercontent.com/FN-Rerechan02/tools/refs/heads/main/dropbear.sh)
+apt install dropbear -y
+bash <(curl -s https://raw.githubusercontent.com/FN-Rerechan02/tools/refs/heads/main/dropbear.sh)
 cd /etc/default
 rm -f /etc/dropbear/dropbear_rsa_host_key
 dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
@@ -705,9 +705,6 @@ LimitNOFILE=1000000
 
 [Install]
 WantedBy=multi-user.target' > /etc/systemd/system/rere.service
-
-echo -e 'HTTP/1.1 101 <b><font color="blue">Rerechan Store</font></b>\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n' > /etc/proxy.txt
-
 systemctl daemon-reload
 systemctl start rere
 systemctl enable rere
