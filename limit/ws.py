@@ -1,41 +1,21 @@
 #!/usr/bin/env python3
-
 import socket
 import threading
 import select
 import sys
 import time
 import getopt
-import os
 
-# Listen
+# Configuration
 LISTENING_ADDR = '127.0.0.1'
 LISTENING_PORT = 10015
-
-if sys.argv[1:]:
-    LISTENING_PORT = int(sys.argv[1])
-
-# Pass
 PASS = ''
-
-# CONST
 BUFLEN = 4096 * 4
 TIMEOUT = 60
 DEFAULT_HOST = '127.0.0.1:143'
-RESPONSE_FILE = '/etc/proxy.txt'
+RESPONSE = 'HTTP/1.1 101 <b><i><font color="blue">Rerechan02</font></b> Switching Protocols\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n'
 
-def load_response():
-    try:
-        with open(RESPONSE_FILE, 'rb') as f:
-            return f.read()
-    except FileNotFoundError:
-        print(f"Warning: Response file {RESPONSE_FILE} not found, using default response")
-        return b'HTTP/1.1 101 <b><font color="blue">FN Project</font></b>\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n'
-    except Exception as e:
-        print(f"Error loading response file: {e}, using default response")
-        return b'HTTP/1.1 101 <b><font color="blue">FN Project</font></b>\r\nUpgrade: websocket\r\nConnection: Upgrade\r\nSec-WebSocket-Accept: foo\r\n\r\n'
-
-RESPONSE = load_response()
+SOCKS_VERSION = 5
 
 class Server(threading.Thread):
     def __init__(self, host, port):
@@ -48,27 +28,24 @@ class Server(threading.Thread):
         self.logLock = threading.Lock()
 
     def run(self):
-        self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.soc.settimeout(2)
-        self.soc.bind((self.host, self.port))
-        self.soc.listen(5)
-        self.running = True
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as soc:
+            soc.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+            soc.settimeout(2)
+            soc.bind((self.host, int(self.port)))
+            soc.listen(5)
+            self.running = True
 
-        try:
             while self.running:
                 try:
-                    c, addr = self.soc.accept()
-                    c.setblocking(1)
+                    client_socket, addr = soc.accept()
+                    client_socket.setblocking(1)
+                    conn = ConnectionHandler(client_socket, self, addr)
+                    conn.start()
+                    self.addConn(conn)
                 except socket.timeout:
                     continue
-
-                conn = ConnectionHandler(c, self, addr)
-                conn.start()
-                self.addConn(conn)
-        finally:
-            self.running = False
-            self.soc.close()
+                except Exception as e:
+                    self.printLog(f"Server error: {e}")
 
     def printLog(self, log):
         with self.logLock:
@@ -86,8 +63,8 @@ class Server(threading.Thread):
     def close(self):
         self.running = False
         with self.threadsLock:
-            for c in list(self.threads):
-                c.close()
+            for conn in list(self.threads):
+                conn.close()
 
 class ConnectionHandler(threading.Thread):
     def __init__(self, socClient, server, addr):
@@ -104,8 +81,8 @@ class ConnectionHandler(threading.Thread):
             try:
                 self.client.shutdown(socket.SHUT_RDWR)
                 self.client.close()
-            except:
-                pass
+            except Exception as e:
+                self.server.printLog(f"Error closing client: {e}")
             finally:
                 self.clientClosed = True
 
@@ -113,47 +90,100 @@ class ConnectionHandler(threading.Thread):
             try:
                 self.target.shutdown(socket.SHUT_RDWR)
                 self.target.close()
-            except:
-                pass
+            except Exception as e:
+                self.server.printLog(f"Error closing target: {e}")
             finally:
                 self.targetClosed = True
 
     def run(self):
         try:
             self.client_buffer = self.client.recv(BUFLEN)
-            hostPort = self.findHeader(self.client_buffer, b'X-Real-Host') or DEFAULT_HOST
-            passwd = self.findHeader(self.client_buffer, b'X-Pass')
-
-            if PASS and passwd != PASS:
-                self.client.send(b'HTTP/1.1 400 WrongPass!\r\n\r\n')
-            elif hostPort.startswith('127.0.0.1') or hostPort.startswith('localhost'):
-                self.method_CONNECT(hostPort)
+            
+            if self.client_buffer[0] == SOCKS_VERSION:
+                self.handle_socks5()
             else:
-                self.client.send(b'HTTP/1.1 403 Forbidden!\r\n\r\n')
+                self.handle_http()
         except Exception as e:
-            self.server.printLog(f'Error: {e}')
+            self.log += f' - error: {e}'
+            self.server.printLog(self.log)
         finally:
             self.close()
             self.server.removeConn(self)
 
-    def findHeader(self, head, header):
-        head = head.decode(errors='ignore')
-        header = header.decode(errors='ignore')
-        for line in head.split('\r\n'):
-            if line.startswith(header + ': '):
-                return line.split(': ', 1)[1]
+    def handle_http(self):
+        self.client_buffer = self.client_buffer.decode('utf-8')
+        hostPort = self.findHeader(self.client_buffer, 'X-Real-Host')
+
+        if not hostPort:
+            hostPort = DEFAULT_HOST
+
+        split = self.findHeader(self.client_buffer, 'X-Split')
+
+        if split:
+            self.client.recv(BUFLEN)
+
+        passwd = self.findHeader(self.client_buffer, 'X-Pass')
+
+        if len(PASS) != 0 and passwd != PASS:
+            self.client.sendall(b'HTTP/1.1 400 WrongPass!\r\n\r\n')
+        elif len(PASS) != 0 or hostPort.startswith('127.0.0.1') or hostPort.startswith('localhost'):
+            self.method_CONNECT(hostPort)
+        else:
+            self.client.sendall(b'HTTP/1.1 403 Forbidden!\r\n\r\n')
+
+    def handle_socks5(self):
+        # SOCKS5 handshake
+        self.client.sendall(b"\x05\x00")  # Version 5, No Authentication Required
+
+        # Request details
+        version, cmd, _, address_type = self.client.recv(4)
+        if cmd != 1:  # Only CONNECT command is supported
+            self.close()
+            return
+
+        # Parse address and port based on address type
+        if address_type == 1:  # IPv4
+            address = socket.inet_ntoa(self.client.recv(4))
+        elif address_type == 3:  # Domain name
+            domain_length = self.client.recv(1)[0]
+            address = self.client.recv(domain_length).decode('utf-8')
+        else:
+            self.close()
+            return
+        port = int.from_bytes(self.client.recv(2), 'big')
+
+        self.log += f' - SOCKS5 CONNECT {address}:{port}'
+        self.connect_target(f"{address}:{port}")
+        self.client.sendall(b"\x05\x00\x00\x01\x00\x00\x00\x00\x00\x00")  # SOCKS5 response
+        self.client_buffer = b''
+        self.server.printLog(self.log)
+        self.doCONNECT()
+
+    def findHeader(self, headers, header_name):
+        headers = headers.split('\r\n')
+        for header in headers:
+            if header.startswith(header_name + ': '):
+                return header[len(header_name) + 2:]
         return ''
 
     def connect_target(self, host):
-        host, _, port = host.partition(':')
-        port = int(port) if port else 443
-        self.target = socket.create_connection((host, port))
-        self.targetClosed = False
+        try:
+            host, port = (host.split(':') + [443])[:2]
+            port = int(port)
+            addr_info = socket.getaddrinfo(host, port)[0]
+            self.target = socket.socket(addr_info[0], addr_info[1], addr_info[2])
+            self.target.connect(addr_info[4])
+            self.targetClosed = False
+        except Exception as e:
+            self.server.printLog(f"Error connecting to target {host}:{port} - {e}")
+            self.client.sendall(b'HTTP/1.1 502 Bad Gateway\r\n\r\n')
+            self.close()
 
     def method_CONNECT(self, path):
         self.log += f' - CONNECT {path}'
         self.connect_target(path)
-        self.client.sendall(RESPONSE)
+        self.client.sendall(RESPONSE.encode('utf-8'))
+        self.client_buffer = b''
         self.server.printLog(self.log)
         self.doCONNECT()
 
@@ -165,17 +195,23 @@ class ConnectionHandler(threading.Thread):
             recv, _, err = select.select(socs, [], socs, 3)
             if err:
                 break
-            for in_ in recv:
-                try:
-                    data = in_.recv(BUFLEN)
-                    if data:
-                        (self.client if in_ is self.target else self.target).sendall(data)
+            if recv:
+                for s in recv:
+                    try:
+                        data = s.recv(BUFLEN)
+                        if not data:
+                            break
+                        if s is self.target:
+                            self.client.send(data)
+                        else:
+                            while data:
+                                sent = self.target.send(data)
+                                data = data[sent:]
                         count = 0
-                    else:
+                    except Exception as e:
+                        self.server.printLog(f"Data transfer error: {e}")
                         break
-                except:
-                    break
-            if count == TIMEOUT:
+            if count >= TIMEOUT:
                 break
 
 def print_usage():
@@ -200,10 +236,10 @@ def parse_args(argv):
             LISTENING_PORT = int(arg)
 
 def main():
-    print("\n:-------PythonProxy-------:")
+    print("\n:-------PythonProxy-------:\n")
     print(f"Listening addr: {LISTENING_ADDR}")
     print(f"Listening port: {LISTENING_PORT}\n")
-    print(":-------------------------:")
+    print(":-------------------------:\n")
     server = Server(LISTENING_ADDR, LISTENING_PORT)
     server.start()
     try:
