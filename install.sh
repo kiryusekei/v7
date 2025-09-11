@@ -786,7 +786,7 @@ unzip menu.zip
 chmod +x *
 rm -f menu.zip
 sudo dos2unix /usr/local/sbin/install-plugin
-rm -rf menu
+#rm -rf menu
 rm -rf menu.zip
 }
 function profile(){
