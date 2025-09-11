@@ -776,10 +776,15 @@ print_success "All Packet"
 function menu(){
 clear
 print_install "Memasang Menu Packet"
+#wget ${REPO}limit/menu.zip
+#unzip menu.zip
+#chmod +x menu/*
+#mv menu/* /usr/local/sbin
+cd usr/local/sbin
 wget ${REPO}limit/menu.zip
 unzip menu.zip
-chmod +x menu/*
-mv menu/* /usr/local/sbin
+chmod +x *
+rm -f menu.zip
 sudo dos2unix /usr/local/sbin/install-plugin
 rm -rf menu
 rm -rf menu.zip
