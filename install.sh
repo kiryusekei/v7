@@ -780,7 +780,7 @@ print_install "Memasang Menu Packet"
 #unzip menu.zip
 #chmod +x menu/*
 #mv menu/* /usr/local/sbin
-cd usr/local/sbin
+cd /usr/local/sbin
 wget ${REPO}limit/menu.zip
 unzip menu.zip
 chmod +x *
