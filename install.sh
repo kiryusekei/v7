@@ -355,8 +355,9 @@ clear
 print_install "Core Xray Latest Version"
 domainSock_dir="/run/xray";! [ -d $domainSock_dir ] && mkdir  $domainSock_dir
 chown www-data.www-data $domainSock_dir
-latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
-bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version
+#latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
+#bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version $latest_version
+bash -c "$(curl -L https://github.com/XTLS/Xray-install/raw/main/install-release.sh)" @ install -u www-data --version 25.8.31
 wget -O /etc/xray/config.json "${REPO}limit/config.json" >/dev/null 2>&1
 wget -O /etc/systemd/system/runn.service "${REPO}limit/runn.service" >/dev/null 2>&1
 domain=$(cat /etc/xray/domain)
@@ -557,18 +558,8 @@ function ins_dropbear(){
 clear
 print_install "Menginstall Dropbear"
 apt install dropbear -y
-bash <(curl -s https://raw.githubusercontent.com/FN-Rerechan02/tools/refs/heads/main/dropbear.sh)
-cd /etc/default
-rm -f /etc/dropbear/dropbear_rsa_host_key
-dropbearkey -t rsa -f /etc/dropbear/dropbear_rsa_host_key
-rm -f /etc/dropbear/dropbear_dss_host_key
-dropbearkey -t dss -f /etc/dropbear/dropbear_dss_host_key
-rm -f /etc/dropbear/dropbear_ecdsa_host_key
-dropbearkey -t ecdsa -f /etc/dropbear/dropbear_ecdsa_host_key
 wget -q -O /etc/default/dropbear "${REPO}limit/dropbear.conf"
 chmod +x /etc/default/dropbear
-echo "/bin/false" >> /etc/shells
-echo "/usr/sbin/nologin" >> /etc/shells
 systemctl restart dropbear
 /etc/init.d/dropbear status
 print_success "Dropbear"
@@ -681,39 +672,6 @@ systemctl stop ws
 systemctl enable ws
 systemctl start ws
 systemctl restart ws
-
-# Install WebSocket Enhanced
-cd /usr/local/sbin
-wget -O rerechanstore "https://raw.githubusercontent.com/kiryusekei/v7/refs/heads/main/limit/ws.py"
-chmod +x rerechanstore
-cd
-echo -e '[Unit]
-Description=Websocket By Rerecha02
-Documentation=https://t.me/project_rerechan
-After=network.target nss-lookup.target
-
-[Service]
-Type=simple
-User=root
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-NoNewPrivileges=true
-Restart=on-failure
-ExecStart=/usr/local/sbin/rerechanstore
-LimitNPROC=10000
-LimitNOFILE=1000000
-
-[Install]
-WantedBy=multi-user.target' > /etc/systemd/system/rere.service
-systemctl daemon-reload
-systemctl start rere
-systemctl enable rere
-
-
-
-
-
-
 wget -q -O /usr/local/share/xray/geosite.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geosite.dat" >/dev/null 2>&1
 wget -q -O /usr/local/share/xray/geoip.dat "https://github.com/Loyalsoldier/v2ray-rules-dat/releases/latest/download/geoip.dat" >/dev/null 2>&1
 wget -O /usr/sbin/ftvpn "${REPO}limit/ftvpn" >/dev/null 2>&1
@@ -776,17 +734,12 @@ print_success "All Packet"
 function menu(){
 clear
 print_install "Memasang Menu Packet"
-#wget ${REPO}limit/menu.zip
-#unzip menu.zip
-#chmod +x menu/*
-#mv menu/* /usr/local/sbin
-cd /usr/local/sbin
 wget ${REPO}limit/menu.zip
 unzip menu.zip
-chmod +x *
-rm -f menu.zip
+chmod +x menu/*
+mv menu/* /usr/local/sbin
 sudo dos2unix /usr/local/sbin/install-plugin
-#rm -rf menu
+rm -rf menu
 rm -rf menu.zip
 }
 function profile(){
@@ -814,13 +767,13 @@ chmod 644 /root/.profile
 cat >/etc/cron.d/daily_reboot <<-END
 SHELL=/bin/sh
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-0 5 * * * root /sbin/reboot
+0 3 * * * root /sbin/reboot
 END
 echo "*/1 * * * * root echo -n > /var/log/nginx/access.log" >/etc/cron.d/log.nginx
 echo "*/1 * * * * root echo -n > /var/log/xray/access.log" >>/etc/cron.d/log.xray
 service cron restart
 cat >/home/daily_reboot <<-END
-5
+3
 END
 cat >/etc/systemd/system/rc-local.service <<EOF
 [Unit]
