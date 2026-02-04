@@ -856,8 +856,21 @@ profile
 enable_services
 restart_system
 }
+function dnsxx(){
+# ==========================================
+# SETUP DNS
+# ==========================================
+sudo systemctl disable systemd-resolved
+sudo systemctl stop systemd-resolved
+sudo rm -rf /etc/resolv.config
+echo -e "nameserver 8.8.8.8\nnameserver 8.8.4.4" | sudo tee /etc/resolv.conf
+sudo chattr +i /etc/resolv.conf
+sudo systemctl start systemd-resolved
+sudo systemctl enable systemd-resolved
+}
 instal
 echo ""
+dnsxx
 history -c
 rm -rf /root/menu
 rm -rf /root/*.zip
